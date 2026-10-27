@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import '@fontsource/schibsted-grotesk/400.css'
 import './styles.css'
+import { Analytics } from '@vercel/analytics/react'
 import App from './App'
 import { AuthProvider } from './lib/auth'
 
@@ -11,6 +12,7 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <AuthProvider>
         <App />
+        <Analytics />
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
