@@ -6,6 +6,7 @@ import Contribute from './pages/Contribute'
 import Account from './pages/Account'
 import Admin from './pages/Admin'
 import About from './pages/About'
+import SignIn from './pages/SignIn'
 
 function NotFound() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="contribute" element={<Contribute />} />
         <Route path="me" element={<Account />} />
         <Route path="admin" element={<Admin />} />
+        <Route path="signin" element={<SignIn />} />
         <Route path="about" element={<About />} />
         <Route path="*" element={<NotFound />} />
       </Route>

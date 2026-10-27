@@ -6,12 +6,12 @@ import { useAsync } from '../lib/hooks'
 import { Icon } from './ui'
 
 function Account() {
-  const { session, me, signIn } = useAuth()
+  const { session, me } = useAuth()
   if (!session) {
     return (
-      <button className="btn small" onClick={() => void signIn()}>
+      <Link to="/signin" className="btn small">
         Sign in
-      </button>
+      </Link>
     )
   }
   return (

@@ -1430,3 +1430,12 @@ a.card.block-card:hover {
     padding: 36px 40px;
   }
 }
+
+.google-btn {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+.google-slot {
+  min-height: 44px;
+}

@@ -7,7 +7,6 @@ type AuthState = {
   ready: boolean
   session: Session | null
   me: Me | null
-  signIn: () => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -44,12 +43,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ready,
     session,
     me,
-    signIn: async () => {
-      await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: window.location.origin + '/', queryParams: { prompt: 'select_account' } },
-      })
-    },
     signOut: async () => {
       await supabase.auth.signOut()
     },

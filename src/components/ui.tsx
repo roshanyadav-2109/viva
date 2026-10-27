@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { useAuth } from '../lib/auth'
+import GoogleButton from './GoogleButton'
 import { chance } from '../lib/format'
 
 const I = ({ d, children }: { d?: string; children?: ReactNode }) => (
@@ -42,13 +43,8 @@ export const Google = () => (
   </svg>
 )
 
-export function SignInButton({ className = 'btn' }: { className?: string }) {
-  const { signIn } = useAuth()
-  return (
-    <button className={className} onClick={() => void signIn()}>
-      <Google /> Continue with Google
-    </button>
-  )
+export function SignInButton(_: { className?: string }) {
+  return <GoogleButton />
 }
 
 export function Gate({ children, what = 'this page' }: { children: ReactNode; what?: string }) {
