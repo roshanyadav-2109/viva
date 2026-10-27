@@ -1,11 +1,14 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import '@fontsource/schibsted-grotesk/400.css'
+import '@fontsource/schibsted-grotesk/latin-400.css'
 import './styles.css'
 import { Analytics } from '@vercel/analytics/react'
 import App from './App'
 import { AuthProvider } from './lib/auth'
+import { api } from './lib/api'
+
+void api.stats().catch(() => undefined)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

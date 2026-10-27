@@ -1439,3 +1439,13 @@ a.card.block-card:hover {
 .google-slot {
   min-height: 44px;
 }
+
+a.res-link {
+  color: var(--brand);
+  text-decoration: underline;
+  text-decoration-color: #b9c0f5;
+  text-underline-offset: 4px;
+}
+a.res-link:hover {
+  text-decoration-color: var(--brand);
+}

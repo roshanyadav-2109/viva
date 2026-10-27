@@ -801,3 +801,48 @@ begin
 end $$;
 revoke all on function public.list_resources(text, text) from public, anon;
 grant execute on function public.list_resources(text, text) to authenticated;
+
+create table if not exists public.site_cache (key text primary key, value jsonb not null, updated_at timestamptz not null default now());
+alter table public.site_cache enable row level security;
+revoke all on public.site_cache from public, anon, authenticated;
+
+insert into public.site_cache (key, value)
+select 'preview', coalesce(jsonb_agg(x), '[]'::jsonb) from (
+  select min(q.body) as body, sum(q.times_asked)::int as times_asked
+  from public.questions q
+  where q.body ~ '\?$' and char_length(q.body) between 25 and 110
+  group by lower(q.body)
+  order by sum(q.times_asked) desc, min(q.id)
+  limit 2) x
+on conflict (key) do update set value = excluded.value, updated_at = now();
+
+create or replace function public.preview_questions() returns table (body text, times_asked integer)
+language sql stable security definer set search_path = '' as $$
+  select e->>'body', (e->>'times_asked')::int
+  from public.site_cache c, jsonb_array_elements(c.value) e
+  where c.key = 'preview';
+$$;
+revoke all on function public.preview_questions() from public;
+grant execute on function public.preview_questions() to anon, authenticated;
+
+create or replace function public.site_stats() returns jsonb
+language sql stable security definer set search_path = '' as $$
+  select jsonb_build_object(
+    'subjects', coalesce((
+      select jsonb_agg(jsonb_build_object('code', s.code, 'name', s.name,
+        'questions', (select count(*) from (select 1 from public.questions q where q.subject = s.code limit 1) t)) order by s.sort)
+      from public.subjects s), '[]'::jsonb)
+  );
+$$;
+
+create or replace function public.list_resources(p_subject text default null, p_kind text default null)
+returns table (id bigint, title text, url text, subject text, kind text)
+language plpgsql stable security definer set search_path = '' as $$
+begin
+  return query
+  select r.id, r.title, r.url, r.subject, r.kind from public.resources r
+  where (p_subject is null or r.subject = p_subject or r.subject is null) and (p_kind is null or r.kind = p_kind)
+  order by (r.subject is null), r.created_at desc, r.id desc limit 100;
+end $$;
+revoke all on function public.list_resources(text, text) from public;
+grant execute on function public.list_resources(text, text) to anon, authenticated;

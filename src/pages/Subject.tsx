@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, Outlet, useParams, useSearchParams } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { KINDS, api } from '../lib/api'
 import { useAuth } from '../lib/auth'
 import { useAsync, useDebounced } from '../lib/hooks'
@@ -15,6 +15,7 @@ const MAX_PAGE = 75
 export function SubjectLayout() {
   const { subject = '' } = useParams()
   const { session, ready } = useAuth()
+  const onResources = useLocation().pathname.endsWith('/resources')
   const stats = useAsync(() => api.stats(), [])
   const info = stats.data?.subjects.find((s) => s.code === subject.toUpperCase())
 
@@ -41,7 +42,7 @@ export function SubjectLayout() {
         <NavLink to={`/s/${info.code}/proctors`}>Proctors</NavLink>
         <NavLink to={`/s/${info.code}/resources`}>Resources</NavLink>
       </nav>
-      {session ? <Outlet /> : <Preview />}
+      {session || onResources ? <Outlet /> : <Preview />}
     </>
   )
 }
@@ -271,7 +272,7 @@ export function SubjectResources() {
         <ul className="list">
           {data?.map((r) => (
             <li className="item" key={r.id}>
-              <a href={r.url} target="_blank" rel="noopener noreferrer nofollow ugc" className="item-body">
+              <a href={r.url} target="_blank" rel="noopener noreferrer nofollow ugc" className="item-body res-link">
                 {r.title}
               </a>
               <div className="meta">

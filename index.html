@@ -7,10 +7,17 @@
     <meta name="robots" content="noindex" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin />
     <title>Viva</title>
+    <style>
+      body{margin:0;background:#fff}
+      .splash{height:100vh;display:grid;place-items:center}
+      .splash i{width:34px;height:34px;border-radius:3px;background:#2b3fe0;animation:p 1s ease-in-out infinite alternate}
+      @keyframes p{to{opacity:.35}}
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="splash"><i></i></div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

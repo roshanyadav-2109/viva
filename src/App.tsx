@@ -1,12 +1,23 @@
+import { lazy, Suspense } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import Home from './pages/Home'
-import { SubjectLayout, SubjectQuestions, SubjectProctors, SubjectProctor, SubjectResources } from './pages/Subject'
-import Contribute from './pages/Contribute'
-import Account from './pages/Account'
-import Admin from './pages/Admin'
-import About from './pages/About'
-import SignIn from './pages/SignIn'
+import { Loading } from './components/ui'
+
+const pick = <T extends Record<string, any>>(load: () => Promise<T>, name: keyof T) =>
+  lazy(() => load().then((m) => ({ default: m[name] })))
+
+const load = () => import('./pages/Subject')
+const SubjectLayout = pick(load, 'SubjectLayout')
+const SubjectQuestions = pick(load, 'SubjectQuestions')
+const SubjectProctors = pick(load, 'SubjectProctors')
+const SubjectProctor = pick(load, 'SubjectProctor')
+const SubjectResources = pick(load, 'SubjectResources')
+const Contribute = lazy(() => import('./pages/Contribute'))
+const Account = lazy(() => import('./pages/Account'))
+const Admin = lazy(() => import('./pages/Admin'))
+const About = lazy(() => import('./pages/About'))
+const SignIn = lazy(() => import('./pages/SignIn'))
 
 function NotFound() {
   return (
@@ -21,22 +32,24 @@ function NotFound() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="s/:subject" element={<SubjectLayout />}>
-          <Route index element={<SubjectQuestions />} />
-          <Route path="proctors" element={<SubjectProctors />} />
-          <Route path="proctors/:code" element={<SubjectProctor />} />
-          <Route path="resources" element={<SubjectResources />} />
+    <Suspense fallback={<Loading rows={3} />}>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="s/:subject" element={<SubjectLayout />}>
+            <Route index element={<SubjectQuestions />} />
+            <Route path="proctors" element={<SubjectProctors />} />
+            <Route path="proctors/:code" element={<SubjectProctor />} />
+            <Route path="resources" element={<SubjectResources />} />
+          </Route>
+          <Route path="contribute" element={<Contribute />} />
+          <Route path="me" element={<Account />} />
+          <Route path="admin" element={<Admin />} />
+          <Route path="about" element={<About />} />
+          <Route path="signin" element={<SignIn />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
-        <Route path="contribute" element={<Contribute />} />
-        <Route path="me" element={<Account />} />
-        <Route path="admin" element={<Admin />} />
-        <Route path="signin" element={<SignIn />} />
-        <Route path="about" element={<About />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
-    </Routes>
+      </Routes>
+    </Suspense>
   )
 }
