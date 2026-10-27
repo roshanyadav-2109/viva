@@ -1,8 +1,7 @@
-import { lazy, Suspense } from 'react'
+import { lazy } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import Home from './pages/Home'
-import { Loading } from './components/ui'
 
 const pick = <T extends Record<string, any>>(load: () => Promise<T>, name: keyof T) =>
   lazy(() => load().then((m) => ({ default: m[name] })))
@@ -18,6 +17,7 @@ const Account = lazy(() => import('./pages/Account'))
 const Admin = lazy(() => import('./pages/Admin'))
 const About = lazy(() => import('./pages/About'))
 const SignIn = lazy(() => import('./pages/SignIn'))
+const ShareOpen = lazy(() => import('./pages/ShareOpen'))
 
 function NotFound() {
   return (
@@ -32,7 +32,7 @@ function NotFound() {
 
 export default function App() {
   return (
-    <Suspense fallback={<Loading rows={3} />}>
+    <>
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />
@@ -47,9 +47,10 @@ export default function App() {
           <Route path="admin" element={<Admin />} />
           <Route path="about" element={<About />} />
           <Route path="signin" element={<SignIn />} />
+          <Route path="r/:code" element={<ShareOpen />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
-    </Suspense>
+    </>
   )
 }

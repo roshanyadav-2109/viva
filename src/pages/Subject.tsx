@@ -7,7 +7,7 @@ import { proctorName } from '../lib/format'
 import { BackLink, Empty, ErrorBox, Loading, Pager } from '../components/ui'
 import { AdminRemove, QuestionItem, ReviewCard } from '../components/items'
 import Preview from '../components/Preview'
-import { host } from '../lib/format'
+import ShareButton from '../components/ShareButton'
 
 const PER = 20
 const MAX_PAGE = 75
@@ -29,11 +29,14 @@ export function SubjectLayout() {
           <h1 className="page-title">{info.code}</h1>
           <p className="muted">{info.name}</p>
         </div>
-        {session && (
-          <Link to={`/contribute?kind=session&subject=${info.code}`} className="btn small">
-            Add questions
-          </Link>
-        )}
+        <div className="row-actions">
+          <ShareButton path={`/s/${info.code}`} title={`${info.code} on Viva`} className="btn small" />
+          {session && (
+            <Link to={`/contribute?kind=session&subject=${info.code}`} className="btn small">
+              Add questions
+            </Link>
+          )}
+        </div>
       </div>
       <nav className="segmented tabs" aria-label="Sections">
         <NavLink to={`/s/${info.code}`} end>
@@ -218,9 +221,12 @@ export function SubjectProctor() {
       <BackLink to={`/s/${sub}/proctors`}>All proctors</BackLink>
       <div className="title-row">
         <h2 className="section-title">{proctorName(data.code)}</h2>
-        <Link className="btn small" to={`/contribute?kind=review&subject=${sub}&proctor=${encodeURIComponent(data.code)}`}>
-          Write a review
-        </Link>
+        <div className="row-actions">
+          <ShareButton path={`/s/${sub}/proctors/${encodeURIComponent(data.code)}`} title={proctorName(data.code)} className="btn small" />
+          <Link className="btn small" to={`/contribute?kind=review&subject=${sub}&proctor=${encodeURIComponent(data.code)}`}>
+            Write a review
+          </Link>
+        </div>
       </div>
 
       <section className="block">
@@ -269,19 +275,21 @@ export function SubjectResources() {
       ) : data && data.length === 0 ? (
         <Empty>No resources yet.</Empty>
       ) : (
-        <ul className="list">
+        <ul className="qgrid">
           {data?.map((r) => (
-            <li className="item" key={r.id}>
-              <a href={r.url} target="_blank" rel="noopener noreferrer nofollow ugc" className="item-body res-link">
-                {r.title}
-              </a>
-              <div className="meta">
-                <span>{r.kind}</span>
-                <span>{host(r.url)}</span>
-                <span>
-                  <AdminRemove kind="resource" id={r.id} onDone={reload} />
-                </span>
+            <li className="card res-row" key={r.id}>
+              <div className="res-main">
+                <p className="item-body">{r.title}</p>
+                <div className="meta">
+                  <span>{r.kind}</span>
+                  <span>
+                    <AdminRemove kind="resource" id={r.id} onDone={reload} />
+                  </span>
+                </div>
               </div>
+              <a className="btn small primary" href={r.url} target="_blank" rel="noopener noreferrer nofollow ugc">
+                Open
+              </a>
             </li>
           ))}
         </ul>

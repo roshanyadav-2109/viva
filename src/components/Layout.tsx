@@ -1,9 +1,9 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useAuth } from '../lib/auth'
 import { api } from '../lib/api'
 import { useAsync } from '../lib/hooks'
-import { Icon } from './ui'
+import { Icon, Loading } from './ui'
 
 function Account() {
   const { session, me } = useAuth()
@@ -61,7 +61,9 @@ export default function Layout() {
       </header>
 
       <main className="wrap page">
-        <Outlet />
+        <Suspense fallback={<Loading rows={3} />}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <footer className="footer wrap">

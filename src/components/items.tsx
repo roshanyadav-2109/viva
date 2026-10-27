@@ -4,6 +4,7 @@ import { api } from '../lib/api'
 import { useAuth } from '../lib/auth'
 import { date, proctorName } from '../lib/format'
 import { Chance, Icon, Meta } from './ui'
+import ShareButton from './ShareButton'
 
 export function AdminRemove({ kind, id, onDone }: { kind: 'question' | 'review' | 'resource'; id: number; onDone?: () => void }) {
   const { me } = useAuth()
@@ -83,6 +84,7 @@ export function QuestionItem(q: {
               {(q.proctor_count ?? 0) > q.proctors.length && ` and ${(q.proctor_count ?? 0) - q.proctors.length} more`}
             </span>
           ),
+          <ShareButton path={`/s/${q.subject}?q=${encodeURIComponent(q.body.slice(0, 120))}`} title={q.body} />,
           <AdminRemove kind="question" id={q.id} />,
         ]}
       />

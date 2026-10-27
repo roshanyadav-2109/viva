@@ -1449,3 +1449,29 @@ a.res-link {
 a.res-link:hover {
   text-decoration-color: var(--brand);
 }
+
+.res-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  background: #fff;
+  border-color: #dfe1f5;
+}
+.res-main {
+  min-width: 0;
+  flex: 1;
+}
+.res-main .meta {
+  margin-top: 8px;
+}
+.row-actions .link,
+.meta .link {
+  color: var(--brand);
+}
+
+.mini-title {
+  font-size: 18px;
+  margin: 28px 0 16px;
+}
