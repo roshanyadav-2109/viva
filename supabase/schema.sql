@@ -789,3 +789,15 @@ begin
 end $$;
 revoke all on function public.subject_proctors(text) from public, anon;
 grant execute on function public.subject_proctors(text) to authenticated;
+create or replace function public.list_resources(p_subject text default null, p_kind text default null)
+returns table (id bigint, title text, url text, subject text, kind text)
+language plpgsql security definer set search_path = '' as $$
+begin
+  perform private.touch(50);
+  return query
+  select r.id, r.title, r.url, r.subject, r.kind from public.resources r
+  where (p_subject is null or r.subject = p_subject or r.subject is null) and (p_kind is null or r.kind = p_kind)
+  order by (r.subject is null), r.created_at desc, r.id desc limit 100;
+end $$;
+revoke all on function public.list_resources(text, text) from public, anon;
+grant execute on function public.list_resources(text, text) to authenticated;
