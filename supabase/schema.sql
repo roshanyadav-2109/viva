@@ -981,3 +981,35 @@ begin
 end $$;
 revoke all on function public.admin_users() from public, anon;
 grant execute on function public.admin_users() to authenticated;
+
+delete from public.site_cache where key like 'preview%';
+
+insert into public.site_cache (key, value)
+select 'preview:' || sub.code, coalesce((
+  select jsonb_agg(x) from (
+    select min(q.body) as body, sum(q.times_asked)::int as times_asked
+    from public.questions q
+    where q.subject = sub.code and q.body ~ '\?$' and char_length(q.body) between 25 and 110
+    group by lower(q.body)
+    order by sum(q.times_asked) desc, min(q.id)
+    limit 6) x), '[]'::jsonb)
+from public.subjects sub;
+
+insert into public.site_cache (key, value)
+select 'preview', coalesce(jsonb_agg(x), '[]'::jsonb) from (
+  select min(q.body) as body, sum(q.times_asked)::int as times_asked
+  from public.questions q
+  where q.body ~ '\?$' and char_length(q.body) between 25 and 110
+  group by lower(q.body)
+  order by sum(q.times_asked) desc, min(q.id)
+  limit 6) x;
+
+drop function if exists public.preview_questions();
+create or replace function public.preview_questions(p_subject text default null) returns table (body text, times_asked integer)
+language sql stable security definer set search_path = '' as $$
+  select e->>'body', (e->>'times_asked')::int
+  from public.site_cache c, jsonb_array_elements(c.value) e
+  where c.key = case when p_subject ~ '^[A-Za-z0-9]{2,12}$' then 'preview:' || upper(p_subject) else 'preview' end;
+$$;
+revoke all on function public.preview_questions(text) from public;
+grant execute on function public.preview_questions(text) to anon, authenticated;

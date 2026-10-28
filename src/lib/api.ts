@@ -87,7 +87,7 @@ export const api = {
     statsCache = null
     throw e
   })),
-  preview: () => rpc<{ body: string; times_asked: number }[]>('preview_questions'),
+  preview: (subject?: string) => rpc<{ body: string; times_asked: number }[]>('preview_questions', { p_subject: subject ?? null }),
   me: () => rpc<Me | null>('me'),
   subjects: () => rpc<{ code: string; name: string }[]>('list_subjects'),
   feed: () => rpc<Feed>('home_feed'),

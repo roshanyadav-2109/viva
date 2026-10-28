@@ -45,7 +45,7 @@ export function SubjectLayout() {
         <NavLink to={`/s/${info.code}/proctors`}>Proctors</NavLink>
         <NavLink to={`/s/${info.code}/resources`}>Resources</NavLink>
       </nav>
-      {session || onResources ? <Outlet /> : <Preview />}
+      {session || onResources ? <Outlet /> : <Preview subject={info.code} />}
     </>
   )
 }

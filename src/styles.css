@@ -1580,3 +1580,14 @@ a.res-link:hover {
 .segmented button {
   padding: 0 6px;
 }
+
+.preview .qgrid {
+  margin-top: 0;
+}
+.blurred {
+  filter: blur(7px);
+  opacity: 0.8;
+}
+.blur-zone .qgrid {
+  margin-top: 12px;
+}

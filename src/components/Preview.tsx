@@ -10,25 +10,29 @@ const blurred = [
   'Why did you choose this approach over the other options available',
 ]
 
-export default function Preview() {
-  const { data } = useAsync(() => api.preview(), [])
+export default function Preview({ subject }: { subject?: string }) {
+  const { data } = useAsync(() => api.preview(subject), [subject])
   return (
     <div className="preview">
-      <ol className="list">
+      <ol className="qgrid">
         {data?.map((q, i) => (
-          <li className="item" key={i}>
-            <p className="item-body">{q.body}</p>
-            <Meta items={[<Chance n={q.times_asked} />]} />
+          <li className="card qcard" key={i}>
+            <div className="qmain">
+              <p className="item-body">{q.body}</p>
+              <Meta items={[<Chance n={q.times_asked} />]} />
+            </div>
           </li>
         ))}
-        {!data && [0, 1].map((i) => <li className="item" key={i}><div className="skeleton-row" /></li>)}
+        {!data && [0, 1, 2, 3, 4, 5].map((i) => <li className="skeleton-row" key={i} />)}
       </ol>
       <div className="blur-zone">
-        <ol className="list blurred" aria-hidden="true">
+        <ol className="qgrid blurred" aria-hidden="true">
           {blurred.map((t, i) => (
-            <li className="item" key={i}>
-              <p className="item-body">{t}</p>
-              <Meta items={['Level 1 Proctor 12', 'Medium chance']} />
+            <li className="card qcard" key={i}>
+              <div className="qmain">
+                <p className="item-body">{t}</p>
+                <Meta items={['Medium chance']} />
+              </div>
             </li>
           ))}
         </ol>
