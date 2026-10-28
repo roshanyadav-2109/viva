@@ -50,6 +50,9 @@ export function QuestionItem(q: {
   times_asked: number
   votes?: number
   voted?: boolean
+  answer?: string
+  demo?: string
+  tips?: string
   hideProctor?: boolean
 }) {
   const [vote, setVote] = useState({ votes: q.votes ?? 0, voted: q.voted ?? false })
@@ -69,6 +72,16 @@ export function QuestionItem(q: {
     <li className="card qcard">
       <div className="qmain">
       <p className="item-body">{q.body}</p>
+      {(q.answer || q.demo || q.tips) && (
+        <details className="guidance">
+          <summary>Open answer guide <span>Answer · demo · viva tips</span></summary>
+          <div className="guidance-grid">
+            {q.answer && <section><h4>Suggested answer</h4><p>{q.answer}</p></section>}
+            {q.demo && <section><h4>Show a demo</h4><p>{q.demo}</p></section>}
+            {q.tips && <section><h4>Pro viva tips</h4><p>{q.tips}</p></section>}
+          </div>
+        </details>
+      )}
       <Meta
         items={[
           <Chance n={q.times_asked} />,

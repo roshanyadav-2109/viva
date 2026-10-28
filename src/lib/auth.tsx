@@ -12,6 +12,17 @@ type AuthState = {
 
 const Ctx = createContext<AuthState | null>(null)
 
+const fromSession = (s: Session): Me => {
+  const m = s.user.user_metadata ?? {}
+  return {
+    id: s.user.id,
+    email: s.user.email ?? '',
+    name: m.full_name ?? m.name ?? (s.user.email ?? '').split('@')[0],
+    avatar: m.avatar_url ?? m.picture ?? null,
+    admin: false,
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [me, setMe] = useState<Me | null>(null)
@@ -20,23 +31,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session)
-      if (!data.session) setReady(true)
+      setReady(true)
     })
-    const { data } = supabase.auth.onAuthStateChange((_event, s) => setSession(s))
+    const { data } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s)
+      setReady(true)
+    })
     return () => data.subscription.unsubscribe()
   }, [])
 
   const uid = session?.user.id
   useEffect(() => {
-    if (!uid) {
+    if (!session) {
       setMe(null)
       return
     }
+    setMe(fromSession(session))
+    let live = true
     api
       .me()
-      .then(setMe)
-      .catch(() => setMe(null))
-      .finally(() => setReady(true))
+      .then((m) => live && m && setMe(m))
+      .catch(() => undefined)
+    return () => {
+      live = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid])
 
   const value: AuthState = {

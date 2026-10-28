@@ -17,6 +17,9 @@ export type Question = {
   votes: number
   voted: boolean
   total: number
+  answer: string
+  demo: string
+  tips: string
 }
 
 export type ProctorRow = { code: string; questions: number; sets: number; reviews: number; total: number }
