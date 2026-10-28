@@ -778,9 +778,7 @@ begin
   )
   select g.id, g.body, g.subject, g.level, g.proctors, g.proctor_count, null::bigint, g.times_asked, g.asked_on,
          coalesce(v.n, 0), coalesce(v.mine, false), count(*) over (),
-         coalesce(gu.answer, 'Prepare a concise definition, explain why it matters, and connect it to your project.'),
-         coalesce(gu.demo, 'Open your project and show the smallest working example. Explain the input, the key step, and the output.'),
-         coalesce(gu.tips, 'Answer in this order: definition -> project usage -> trade-off -> limitation. Do not claim features you cannot demonstrate.')
+         gu.answer, gu.demo, gu.tips
   from g
   left join v on v.subject = g.subject and v.qkey = g.qkey
   left join public.question_guidance gu on gu.subject = g.subject and gu.qkey = g.qkey
@@ -961,3 +959,25 @@ end $$;
 revoke all on function public.create_share(text), public.open_share(text, text), public.admin_shares(), public.admin_share_opens(text) from public, anon;
 grant execute on function public.create_share(text), public.admin_shares(), public.admin_share_opens(text) to authenticated;
 grant execute on function public.open_share(text, text) to anon, authenticated;
+
+create or replace function public.admin_users() returns jsonb
+language plpgsql stable security definer set search_path = '' as $$
+begin
+  if not private.is_admin() then raise exception 'not allowed' using errcode = '42501'; end if;
+  return coalesce((
+    select jsonb_agg(x order by x.created_at desc) from (
+      select u.id,
+             u.email,
+             coalesce(u.raw_user_meta_data->>'full_name', u.raw_user_meta_data->>'name') as name,
+             u.raw_user_meta_data->>'avatar_url' as avatar,
+             u.created_at,
+             u.last_sign_in_at,
+             (select count(*) from public.submissions s where s.user_id = u.id)::int as submissions,
+             (select count(*) from public.shares h where h.user_id = u.id)::int as shares,
+             (select count(*) from public.question_votes v where v.user_id = u.id)::int as votes
+      from auth.users u
+      order by u.created_at desc
+      limit 1000) x), '[]'::jsonb);
+end $$;
+revoke all on function public.admin_users() from public, anon;
+grant execute on function public.admin_users() to authenticated;

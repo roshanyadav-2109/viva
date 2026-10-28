@@ -63,6 +63,8 @@ export type Submission = {
 export type ShareRow = { code: string; path: string; email: string; created_at: string; opens: number; people: number; last_opened: string | null }
 export type ShareOpen = { who: string; opened_at: string }
 
+export type AdminUser = { id: string; email: string; name: string | null; avatar: string | null; created_at: string; last_sign_in_at: string | null; submissions: number; shares: number; votes: number }
+
 export const KINDS = ['Guide', 'Video', 'Code', 'Tool', 'Notes', 'Other']
 
 async function rpc<T>(name: string, args?: Record<string, unknown>): Promise<T> {
@@ -102,6 +104,7 @@ export const api = {
   subjectProctors: (subject: string) => rpc<{ code: string }[]>('subject_proctors', { p_subject: subject }),
   createShare: (path: string) => rpc<string>('create_share', { p_path: path }),
   openShare: (code: string, visitor: string) => rpc<string | null>('open_share', { p_code: code, p_visitor: visitor }),
+  adminUsers: () => rpc<AdminUser[]>('admin_users'),
   adminShares: () => rpc<ShareRow[]>('admin_shares'),
   adminShareOpens: (code: string) => rpc<ShareOpen[]>('admin_share_opens', { p_code: code }),
   vote: (id: number) => rpc<{ votes: number; voted: boolean }>('toggle_vote', { p_id: id }),

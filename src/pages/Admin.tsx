@@ -122,22 +122,58 @@ function ShareItem({ r, open, onToggle }: { r: ShareRow; open: boolean; onToggle
   )
 }
 
+function Users() {
+  const { data, error, loading, reload } = useAsync(() => api.adminUsers(), [])
+  const [q, setQ] = useState('')
+  if (loading) return <Loading rows={4} />
+  if (error) return <ErrorBox message={error} retry={reload} />
+  const list = (data ?? []).filter((u) => `${u.email} ${u.name ?? ''}`.toLowerCase().includes(q.trim().toLowerCase()))
+  return (
+    <>
+      <p className="muted">{data?.length ?? 0} users</p>
+      <input className="field" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name or email" maxLength={80} aria-label="Search users" />
+      <ul className="list">
+        {list.map((u) => (
+          <li className="item user-row" key={u.id}>
+            {u.avatar ? <img className="admin-avatar" src={u.avatar} alt="" referrerPolicy="no-referrer" /> : <span className="admin-avatar fallback">{(u.name ?? u.email).slice(0, 1).toUpperCase()}</span>}
+            <div>
+              <p className="item-body">{u.name || u.email}</p>
+              <div className="meta">
+                {u.name && <span>{u.email}</span>}
+                <span>Joined {date(u.created_at)}</span>
+                {u.last_sign_in_at && <span>Last seen {date(u.last_sign_in_at)}</span>}
+                <span>{u.submissions} submissions</span>
+                <span>{u.shares} shares</span>
+                <span>{u.votes} upvotes</span>
+              </div>
+            </div>
+          </li>
+        ))}
+        {list.length === 0 && <Empty>No users found.</Empty>}
+      </ul>
+    </>
+  )
+}
+
 function Queue() {
   const { me } = useAuth()
   const [status, setStatus] = useState('pending')
-  const { data, error, loading, reload } = useAsync(() => (me?.admin && status !== 'shares' ? api.adminList(status) : Promise.resolve([])), [status, me?.admin])
+  const { data, error, loading, reload } = useAsync(() => (me?.admin && status !== 'shares' && status !== 'users' ? api.adminList(status) : Promise.resolve([])), [status, me?.admin])
   if (!me?.admin) return <Empty>This page is for admins.</Empty>
   const tab = status === 'shares'
+  const people = status === 'users'
   return (
     <>
       <div className="segmented">
-        {['pending', 'approved', 'rejected', 'shares'].map((x) => (
+        {['pending', 'approved', 'rejected', 'shares', 'users'].map((x) => (
           <button key={x} className={status === x ? 'on' : ''} onClick={() => setStatus(x)}>
             {x[0].toUpperCase() + x.slice(1)}
           </button>
         ))}
       </div>
-      {tab ? (
+      {people ? (
+        <Users />
+      ) : tab ? (
         <Shares />
       ) : loading ? (
         <Loading rows={4} />
@@ -157,10 +193,24 @@ function Queue() {
 }
 
 export default function Admin() {
+  const { me } = useAuth()
   return (
     <>
       <h1 className="page-title">Approvals</h1>
       <Gate what="approvals">
+        <section className="account admin-profile" aria-label="Signed-in admin details">
+          <div className="admin-identity">
+            {me?.avatar ? <img className="admin-avatar" src={me.avatar} alt="" referrerPolicy="no-referrer" /> : <span className="admin-avatar fallback">{(me?.name ?? '?').slice(0, 1).toUpperCase()}</span>}
+            <div>
+              <p className="item-body">{me?.name || 'Admin user'}</p>
+              <p className="muted">{me?.email}</p>
+            </div>
+          </div>
+          <div className="admin-details">
+            <span><b>Role</b> Administrator</span>
+            <span><b>User ID</b> {me?.id}</span>
+          </div>
+        </section>
         <Queue />
       </Gate>
     </>

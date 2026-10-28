@@ -53,9 +53,7 @@ begin
   )
   select g.id, g.body, g.subject, g.level, g.proctors, g.proctor_count, null::bigint,
          g.times_asked, g.asked_on, coalesce(v.n, 0), coalesce(v.mine, false), count(*) over (),
-         coalesce(gu.answer, 'Prepare a concise definition, explain why it matters, and connect it to your project.'),
-         coalesce(gu.demo, 'Open your project and show the smallest working example. Explain the input, the key step, and the output.'),
-         coalesce(gu.tips, 'Answer in this order: definition -> project usage -> trade-off -> limitation. Do not claim features you cannot demonstrate.')
+         gu.answer, gu.demo, gu.tips
   from g
   left join v on v.subject = g.subject and v.qkey = g.qkey
   left join public.question_guidance gu on gu.subject = g.subject and gu.qkey = g.qkey

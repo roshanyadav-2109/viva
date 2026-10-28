@@ -3,7 +3,6 @@ Usage: SBP=<access token> SUPABASE_REF=<ref> python -I import_workbook.py <workb
 The token is read from the environment only.
 """
 import json, os, re, sys, urllib.error, urllib.request
-from pathlib import Path
 import pandas as pd
 
 REF = os.environ["SUPABASE_REF"]
@@ -98,8 +97,6 @@ def main(path):
 
     run("select setval(pg_get_serial_sequence('public.sets','id'), (select max(id) from public.sets));"
         "select setval(pg_get_serial_sequence('public.questions','id'), (select max(id) from public.questions));")
-    seed = Path(__file__).resolve().parents[1] / "supabase" / "question_guidance_seed.sql"
-    run(seed.read_text(encoding="utf-8"))
     print(run("select (select count(*) from public.questions) q,(select count(*) from public.sets) s,(select count(*) from public.proctors) p,(select count(*) from public.reviews) r"))
 
 

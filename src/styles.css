@@ -766,6 +766,45 @@ a.item-body:hover {
   border: 1px solid var(--line);
   border-radius: var(--r);
 }
+.admin-profile {
+  align-items: center;
+  margin-bottom: 24px;
+}
+.admin-identity,
+.admin-details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.admin-details {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  color: var(--muted);
+  font-size: 13px;
+}
+.admin-details span {
+  display: grid;
+  gap: 2px;
+}
+.admin-details b {
+  color: var(--ink);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.admin-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.admin-avatar.fallback {
+  display: grid;
+  place-items: center;
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 700;
+}
 .item-toggle {
   display: flex;
   width: 100%;
@@ -1525,4 +1564,19 @@ a.res-link:hover {
 .mini-title {
   font-size: 18px;
   margin: 28px 0 16px;
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.user-row .admin-avatar {
+  flex: none;
+}
+.segmented {
+  max-width: 720px;
+}
+.segmented button {
+  padding: 0 6px;
 }
